@@ -21,6 +21,13 @@ public:
 	~vector();
 
 	double& operator[](int i);
+	const double& operator[](int i) const;
+
+	friend vector operator+(const vector& left, const vector& right);
+	friend vector operator-(const vector& left, const vector& right);
+
+	vector& operator+=(const vector& oth);
+	vector& operator-=(const vector& oth);
 
 	double norm1();
 	double norm2();

@@ -41,6 +41,10 @@ double& vector::operator[](int i) {
 	return data[i];
 }
 
+const double& vector::operator[](int i) const {
+	return data[i];
+}
+
 void vector::dump() {
 	std::cout << "vector [" << this << "]:" << std::endl;
 	std::cout << "\tn = " << n << std::endl;
@@ -81,4 +85,28 @@ double vector::norm3() {
 
 void vector::swap(int i, int j) {
 	std::swap((*this)[i], (*this)[j]);
+}
+
+vector operator+(const vector& left, const vector& right) {
+	vector res{left};
+	return res += right;
+}
+
+vector operator-(const vector& left, const vector& right) {
+	vector res{left};
+	return res -= right;
+}
+
+vector& vector::operator+=(const vector& oth) {
+	for (int i = 0; i < n; i++)
+		this->data[i] += oth.data[i];
+
+	return *this;
+}
+
+vector& vector::operator-=(const vector& oth) {
+	for (int i = 0; i < n; i++)
+		this->data[i] -= oth.data[i];
+
+	return *this;
 }

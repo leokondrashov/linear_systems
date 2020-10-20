@@ -10,7 +10,7 @@ clean:
 	rm *.o
 	rm linear_system
 
-linear_system: vector.o matrix.o gauss.o
+linear_system: vector.o matrix.o seidel.o gauss.o
 
 -include *.d
 

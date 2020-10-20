@@ -3,27 +3,23 @@
 
 #include "matrix.h"
 
-matrix::matrix(int n, int m) : n(n), m(m) {
-	lines.resize(n, {m});
+matrix::matrix(int n) : n(n) {
+	lines.resize(n, {n});
 }
 
 matrix::matrix(const matrix& oth) {
 	n = oth.n;
-	m = oth.m;
 	lines = oth.lines;
 }
 
 matrix::matrix(matrix&& oth) {
 	n = oth.n;
 	oth.n = 0;
-	m = oth.m;
-	oth.m = 0;
 	lines = std::move(oth.lines);
 }
 
 matrix& matrix::operator=(const matrix& oth) {
 	n = oth.n;
-	m = oth.m;
 	lines = oth.lines;
 
 	return *this;
@@ -32,8 +28,6 @@ matrix& matrix::operator=(const matrix& oth) {
 matrix& matrix::operator=(matrix&& oth) {
 	n = oth.n;
 	oth.n = 0;
-	m = oth.m;
-	oth.m = 0;
 	lines = std::move(oth.lines);
 
 	return *this;
@@ -42,31 +36,31 @@ matrix& matrix::operator=(matrix&& oth) {
 matrix::~matrix() {
 }
 
-matrix::matrix_line::matrix_line(int m) : m(m){
-	data.resize(m);
+matrix::matrix_line::matrix_line(int n) : n(n){
+	data.resize(n);
 }
 
 matrix::matrix_line::matrix_line(const matrix_line& ml) {
-	m = ml.m;
+	n = ml.n;
 	data = ml.data;
 }
 
 matrix::matrix_line::matrix_line(matrix_line&& ml) {
-	m = ml.m;
-	ml.m = 0;
+	n = ml.n;
+	ml.n = 0;
 	data = std::move(ml.data);
 }
 
 matrix::matrix_line& matrix::matrix_line::operator=(const matrix_line& ml) {
-	m = ml.m;
+	n = ml.n;
 	data = ml.data;
 
 	return *this;
 }
 
 matrix::matrix_line& matrix::matrix_line::operator=(matrix_line&& ml) {
-	m = ml.m;
-	ml.m = 0;
+	n = ml.n;
+	ml.n = 0;
 	data = std::move(ml.data);
 
 	return *this;
@@ -87,7 +81,7 @@ void matrix::dump() {
 	std::cout << "matrix [" << this << "]:" << std::endl;
 	for (int i = 0; i < n; i++) {
 		std::cout << "[ ";
-		for (int j = 0; j < m; j++) {
+		for (int j = 0; j < n; j++) {
 			std::cout << (*this)[i][j] << " ";
 		}
 		std::cout << "]" << std::endl;
@@ -95,7 +89,7 @@ void matrix::dump() {
 }
 
 matrix::matrix_line& matrix::matrix_line::operator+=(const matrix_line& ml) {
-	for (int i = 0; i < m; i++) {
+	for (int i = 0; i < n; i++) {
 		data[i] += ml.data[i];
 	}
 
@@ -103,23 +97,39 @@ matrix::matrix_line& matrix::matrix_line::operator+=(const matrix_line& ml) {
 }
 
 matrix::matrix_line& matrix::matrix_line::operator*=(double d) {
-	for (int i = 0; i < m; i++) {
+	for (int i = 0; i < n; i++) {
 		data[i] *= d;
 	}
 
 	return *this;
 }
 
-matrix::matrix_line& operator+(matrix::matrix_line left, const matrix::matrix_line& right) {
-	return left += right;
+matrix::matrix_line& matrix::matrix_line::operator/=(double d) {
+	for (int i = 0; i < n; i++) {
+		data[i] /= d;
+	}
+
+	return *this;
 }
 
-matrix::matrix_line& operator*(matrix::matrix_line left, double right) {
-	return left *= right;
+matrix::matrix_line operator+(const matrix::matrix_line& left, const matrix::matrix_line& right) {
+	matrix::matrix_line res{left};
+	return res += right;
 }
 
-matrix::matrix_line& operator*(double left, matrix::matrix_line right) {
-	return right *= left;
+matrix::matrix_line operator*(const matrix::matrix_line& left, double right) {
+	matrix::matrix_line res{left};
+	return res *= right;
+}
+
+matrix::matrix_line operator*(double left, const matrix::matrix_line& right) {
+	matrix::matrix_line res{right};
+	return res *= left;
+}
+
+matrix::matrix_line operator/(const matrix::matrix_line& left, double right) {
+	matrix::matrix_line res{left};
+	return res /= right;
 }
 
 void matrix::swap_columns(int i, int j) {
@@ -130,4 +140,112 @@ void matrix::swap_columns(int i, int j) {
 
 void matrix::swap_rows(int i, int j) {
 	std::swap((*this)[i], (*this)[j]);
+}
+
+matrix operator+(const matrix& left, const matrix& right) {
+	matrix res{left};
+	return res += right;
+}
+
+matrix operator-(const matrix& left, const matrix& right) {
+	matrix res{left};
+	return res -= right;
+}
+
+matrix operator*(const matrix& left, const matrix& right) {
+	matrix res{left};
+	return res *= right;
+}
+
+matrix operator*(const matrix& left, double right) {
+	matrix res{left};
+	return res *= right;
+} 
+
+matrix operator*(double left, const matrix& right) {
+	matrix res{right};
+	return res *= left;
+}
+
+vector operator*(const matrix& left, const vector& right) {
+	vector res{left.height()};
+
+	for (int i = 0; i < left.height(); i++)
+		for (int j = 0; j < left.width(); j++)
+			res[i] += left.lines[i].data[j] * right[j];
+
+	return res;
+}
+
+matrix& matrix::operator+=(const matrix& m) {
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			lines[i][j] += m.lines[i].data[j];
+
+	return *this;
+}
+
+matrix& matrix::operator-=(const matrix& m) {
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			lines[i][j] -= m.lines[i].data[j];
+
+	return *this;
+}
+
+matrix& matrix::operator*=(const matrix& m) {
+	matrix tmp = {this->n}; 
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			for (int k = 0; k < n; k++)
+				tmp[i][j] += lines[i][k] * m.lines[k].data[j];
+
+	*this = std::move(tmp);
+	return *this;
+}
+
+matrix& matrix::operator*=(double d) {
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			lines[i][j] *= d;
+
+	return *this;
+}
+
+matrix matrix::inverse() { 
+	matrix tmp = *this, res = {n};
+	for (int i = 0; i < n; i++)
+		res[i][i] = 1;
+
+	for (int i = 0; i < n; i++) {
+		int row_max = -1;
+		double max = -1;
+		for (int j = i; j < n; j++) {
+			if (std::abs(lines[j][i]) > max) {
+				max = std::abs(lines[j][i]);
+				row_max = j;
+			}
+		}
+
+		res.swap_rows(i, row_max);
+		tmp.swap_rows(i, row_max);
+
+		for (int j = i + 1; j < n; j++) {
+			double k_j = - tmp[j][i] / tmp[i][i];
+			tmp[j] += tmp[i] * k_j;
+			res[j] += res[i] * k_j;
+		}
+
+		res[i] /= tmp[i][i];
+		tmp[i] /= tmp[i][i];
+	}
+
+	for (int i = n - 1; i >= 0; i--) {
+		for (int j = i - 1; j >= 0; j--) {
+			res[j] += res[i] * -tmp[j][i];
+			tmp[j] += tmp[i] * -tmp[j][i];
+		}
+	}
+
+	return res;
 }

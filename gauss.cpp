@@ -46,8 +46,8 @@ vector gaussian_solver::solve() {
 
 void gaussian_solver::direct() {
 	for (int i = 0; i < n; i++) {
-		int row_max = 0, col_max = 0; // find the biggest element
-		double abs_max = 0;
+		int row_max = -1, col_max = -1; // find the biggest element
+		double abs_max = -1;
 		for (int j = i; j < n; j++) {
 			for (int k = i; k < n; k++) {
 				if (std::abs(A[j][k]) > abs_max) {
