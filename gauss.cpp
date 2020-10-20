@@ -85,8 +85,5 @@ vector gaussian_solver::reverse() {
 		}
 	}
 
-//	A.dump();
-//	f.dump();
-
 	return u;
 }
