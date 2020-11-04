@@ -61,8 +61,8 @@ void vector::dump() {
 double vector::norm1() {
 	double max = 0;
 	for (int i = 0; i < n; i++)
-		if (max < abs(data[i]))
-			max = abs(data[i]);
+		if (max < std::abs(data[i]))
+			max = std::abs(data[i]);
 
 	return max;
 }
@@ -70,7 +70,7 @@ double vector::norm1() {
 double vector::norm2() {
 	double sum = 0;
 	for (int i = 0; i < n; i++)
-		sum += abs(data[i]);
+		sum += std::abs(data[i]);
 
 	return sum;
 }

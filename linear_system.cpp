@@ -17,7 +17,7 @@ int main() {
 
 	for (int i = 0; i < 100; i++) {
 		A[99][i] = 1;
-		f[i] = 1;
+		f[i] = i;
 	}
 
 
